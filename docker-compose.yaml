@@ -22,6 +22,7 @@ services:
       /opt/mssql/bin/sqlservr &
       sleep 30 &&
       /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P NotPostgres123! -d master -i /sql-scripts/init-db.sql &&
+      /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P NotPostgres123! -d Northwind -i /sql-scripts/user-init.sql &&
       wait"
     healthcheck:
       test: "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P NotPostgres123! -Q 'select 1'"

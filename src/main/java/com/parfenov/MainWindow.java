@@ -1,18 +1,27 @@
 package com.parfenov;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.List;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 public class MainWindow extends JFrame {
 
-  private JEditorPane outputArea;
-  private BusinessLayer businessLayer;
+  private JTextField serverField;
+  private JTextField databaseField;
+  private JTextField usernameField;
+  private JPasswordField passwordField;
+  private JTextArea outputArea;
 
   public MainWindow() {
-    setTitle("Northwind Customer Data");
+    setTitle("Northwind Database Access");
     setSize(600, 400);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     initComponents();
@@ -20,46 +29,76 @@ public class MainWindow extends JFrame {
 
   private void initComponents() {
     setLayout(new BorderLayout());
+    JPanel loginPanel = new JPanel();
+    loginPanel.setLayout(new GridLayout(5, 2));
 
-    JButton loadDataButton = new JButton("Load Customer Data");
-    outputArea = new JEditorPane();
+    serverField = new JTextField();
+    databaseField = new JTextField();
+    usernameField = new JTextField();
+    passwordField = new JPasswordField();
+
+    loginPanel.add(new JLabel("Server:"));
+    loginPanel.add(serverField);
+    loginPanel.add(new JLabel("Database:"));
+    loginPanel.add(databaseField);
+    loginPanel.add(new JLabel("Username:"));
+    loginPanel.add(usernameField);
+    loginPanel.add(new JLabel("Password:"));
+    loginPanel.add(passwordField);
+
+    JButton connectButton = new JButton("Connect");
+    loginPanel.add(connectButton);
+
+    add(loginPanel, BorderLayout.NORTH);
+
+    outputArea = new JTextArea();
     outputArea.setEditable(false);
-    outputArea.setContentType("text/html");
-    add(loadDataButton, BorderLayout.NORTH);
+
     add(new JScrollPane(outputArea), BorderLayout.CENTER);
-    loadDataButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        try {
-          businessLayer = new BusinessLayer();
-          displayData();
-        } catch (Exception ex) {
-          outputArea.setText("<html><body>Error: " + ex.getMessage() + "</body></html>");
-        }
+
+    connectButton.addActionListener(e -> {
+      String server = serverField.getText();
+      String database = databaseField.getText();
+      String username = usernameField.getText();
+      String password = new String(passwordField.getPassword());
+
+      outputArea.setText("");
+
+      try {
+        // Создаем бизнес-слой
+        BusinessLayer businessLayer = new BusinessLayer(server, database, username, password);
+        outputArea.append("Connected successfully!\n");
+        displayData(businessLayer, username);
+      } catch (Exception ex) {
+        outputArea.append("An unexpected error occurred: " + ex.getMessage() + "\n");
+        ex.printStackTrace();
       }
     });
   }
 
-  private void displayData() throws Exception {
-    long customerCount = businessLayer.getCustomerCount();
-    List<String> customerNames = businessLayer.getCustomerNames();
-    List<String> customerLastNames = businessLayer.getCustomerLastNames();
+  private void displayData(BusinessLayer businessLayer, String username) throws Exception {
     StringBuilder output = new StringBuilder();
-    output.append("<html><body>");
-    output.append("<b>Customer count: ").append(customerCount).append("</b><br><br>");
-    output.append("<b>Customer Names:</b><br>");
-    for (String name : customerNames) {
-      output.append(name).append("<br>");
-    }
-    output.append("<br>");
-    output.append("<b>Customer Last Names:</b><br>");
-    for (String lastName : customerLastNames) {
-      output.append(lastName).append("<br>");
+
+    if (username.equals("User_CEO")) {
+      output.append("CEO Access:\n");
+      output.append("Total Customers: ").append(businessLayer.getCustomerCount()).append("\n");
+      output.append("Customer Names:\n").append(String.join("\n", businessLayer.getCustomerNames())).append("\n");
+      output.append("Total Employees: ").append(businessLayer.getEmployeeCount()).append("\n");
+      output.append("Order Details:\n").append(String.join("\n", businessLayer.getOrderDetails())).append("\n");
+    } else if (username.equals("User_HR")) {
+      output.append("HR Access:\n");
+      output.append("Total Employees: ").append(businessLayer.getEmployeeCount()).append("\n");
+      output.append("Employee Names:\n").append(String.join("\n", businessLayer.getEmployeeNames())).append("\n");
+    } else if (username.equals("User_Sales")) {
+      output.append("Sales Access:\n");
+      output.append("Total Customers: ").append(businessLayer.getCustomerCount()).append("\n");
+      output.append("Customer Names:\n").append(String.join("\n", businessLayer.getCustomerNames())).append("\n");
+      output.append("Order Details:\n").append(String.join("\n", businessLayer.getOrderDetails())).append("\n");
     }
 
-    output.append("</body></html>");
     outputArea.setText(output.toString());
   }
+
 
   public static void main(String[] args) {
     SwingUtilities.invokeLater(() -> {

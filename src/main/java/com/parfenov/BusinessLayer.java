@@ -6,8 +6,8 @@ public class BusinessLayer {
 
   private DataAccessLayer dataAccessLayer;
 
-  public BusinessLayer() throws Exception {
-    this.dataAccessLayer = new DataAccessLayer();
+  public BusinessLayer(String server, String database, String username, String password) throws Exception {
+    this.dataAccessLayer = new DataAccessLayer(server, database, username, password);
   }
 
   public long getCustomerCount() throws Exception {
@@ -18,7 +18,19 @@ public class BusinessLayer {
     return dataAccessLayer.getCustomerNames();
   }
 
-  public List<String> getCustomerLastNames() throws Exception {
-    return dataAccessLayer.getCustomerLastNames();
+  public long getEmployeeCount() throws Exception {
+    return dataAccessLayer.getEmployeeCount();
+  }
+
+  public List<String> getEmployeeNames() throws Exception {
+    return dataAccessLayer.getEmployeeNames();
+  }
+
+  public long getOrderCount() throws Exception {
+    return dataAccessLayer.getOrderCount();
+  }
+
+  public List<String> getOrderDetails() throws Exception {
+    return dataAccessLayer.getOrderDetails();
   }
 }
