@@ -64,16 +64,46 @@ public class MainWindow extends JFrame {
 
       outputArea.setText("");
 
+      if (!validateInput(server, database, username, password)) {
+        return;
+      }
+
       try {
-        // Создаем бизнес-слой
         BusinessLayer businessLayer = new BusinessLayer(server, database, username, password);
         outputArea.append("Connected successfully!\n");
         displayData(businessLayer, username);
       } catch (Exception ex) {
-        outputArea.append("An unexpected error occurred: " + ex.getMessage() + "\n");
-        ex.printStackTrace();
+        outputArea.append("An unexpected error occurred. Please contact support.\n");
       }
     });
+  }
+
+  private boolean validateInput(String server, String database, String username, String password) {
+    if (server == null || server.isEmpty()) {
+      outputArea.append("Error: Server cannot be empty.\n");
+      return false;
+    }
+    if (database == null || database.isEmpty()) {
+      outputArea.append("Error: Database cannot be empty.\n");
+      return false;
+    }
+    if (username == null || username.isEmpty()) {
+      outputArea.append("Error: Username cannot be empty.\n");
+      return false;
+    }
+    if (password == null || password.isEmpty()) {
+      outputArea.append("Error: Password cannot be empty.\n");
+      return false;
+    }
+    if (!server.matches("^[a-zA-Z0-9._-]+$")) {
+      outputArea.append("Error: Invalid characters in server name. Only letters, numbers, dots, underscores, and hyphens are allowed.\n");
+      return false;
+    }
+    if (!database.matches("^[a-zA-Z0-9_-]+$")) {
+      outputArea.append("Error: Invalid characters in database name. Only letters, numbers, underscores, and hyphens are allowed.\n");
+      return false;
+    }
+    return true;
   }
 
   private void displayData(BusinessLayer businessLayer, String username) throws Exception {
@@ -98,7 +128,6 @@ public class MainWindow extends JFrame {
 
     outputArea.setText(output.toString());
   }
-
 
   public static void main(String[] args) {
     SwingUtilities.invokeLater(() -> {
