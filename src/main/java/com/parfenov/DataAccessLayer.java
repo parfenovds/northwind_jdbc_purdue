@@ -2,7 +2,9 @@ package com.parfenov;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,15 +21,15 @@ public class DataAccessLayer {
     this.password = password;
   }
 
-  private Connection getConnection() throws Exception {
+  private Connection getConnection() throws SQLException {
     return DriverManager.getConnection(connectionString, username, password);
   }
 
-  public long getCustomerCount() throws Exception {
+  public long getCustomerCount() throws SQLException {
     String query = "SELECT COUNT(*) FROM Customers";
     try (Connection connection = getConnection();
-         Statement stmt = connection.createStatement();
-         ResultSet rs = stmt.executeQuery(query)) {
+         PreparedStatement pstmt = connection.prepareStatement(query);
+         ResultSet rs = pstmt.executeQuery()) {
       if (rs.next()) {
         return rs.getLong(1);
       }
@@ -35,12 +37,12 @@ public class DataAccessLayer {
     return 0;
   }
 
-  public List<String> getCustomerNames() throws Exception {
+  public List<String> getCustomerNames() throws SQLException {
     List<String> result = new ArrayList<>();
     String query = "SELECT ContactName FROM Customers";
     try (Connection connection = getConnection();
-         Statement stmt = connection.createStatement();
-         ResultSet rs = stmt.executeQuery(query)) {
+         PreparedStatement pstmt = connection.prepareStatement(query);
+         ResultSet rs = pstmt.executeQuery()) {
       while (rs.next()) {
         result.add(rs.getString("ContactName"));
       }
@@ -48,11 +50,11 @@ public class DataAccessLayer {
     return result;
   }
 
-  public long getEmployeeCount() throws Exception {
+  public long getEmployeeCount() throws SQLException {
     String query = "SELECT COUNT(*) FROM Employees";
     try (Connection connection = getConnection();
-         Statement stmt = connection.createStatement();
-         ResultSet rs = stmt.executeQuery(query)) {
+         PreparedStatement pstmt = connection.prepareStatement(query);
+         ResultSet rs = pstmt.executeQuery()) {
       if (rs.next()) {
         return rs.getLong(1);
       }
@@ -60,12 +62,12 @@ public class DataAccessLayer {
     return 0;
   }
 
-  public List<String> getEmployeeNames() throws Exception {
+  public List<String> getEmployeeNames() throws SQLException {
     List<String> result = new ArrayList<>();
     String query = "SELECT FirstName, LastName FROM Employees";
     try (Connection connection = getConnection();
-         Statement stmt = connection.createStatement();
-         ResultSet rs = stmt.executeQuery(query)) {
+         PreparedStatement pstmt = connection.prepareStatement(query);
+         ResultSet rs = pstmt.executeQuery()) {
       while (rs.next()) {
         String fullName = rs.getString("FirstName") + " " + rs.getString("LastName");
         result.add(fullName);
@@ -74,11 +76,11 @@ public class DataAccessLayer {
     return result;
   }
 
-  public long getOrderCount() throws Exception {
+  public long getOrderCount() throws SQLException {
     String query = "SELECT COUNT(*) FROM Orders";
     try (Connection connection = getConnection();
-         Statement stmt = connection.createStatement();
-         ResultSet rs = stmt.executeQuery(query)) {
+         PreparedStatement pstmt = connection.prepareStatement(query);
+         ResultSet rs = pstmt.executeQuery()) {
       if (rs.next()) {
         return rs.getLong(1);
       }
@@ -86,12 +88,12 @@ public class DataAccessLayer {
     return 0;
   }
 
-  public List<String> getOrderDetails() throws Exception {
+  public List<String> getOrderDetails() throws SQLException {
     List<String> result = new ArrayList<>();
     String query = "SELECT OrderID, ShipName FROM Orders";
     try (Connection connection = getConnection();
-         Statement stmt = connection.createStatement();
-         ResultSet rs = stmt.executeQuery(query)) {
+         PreparedStatement pstmt = connection.prepareStatement(query);
+         ResultSet rs = pstmt.executeQuery()) {
       while (rs.next()) {
         String orderDetail = "OrderID: " + rs.getInt("OrderID") + ", ShipName: " + rs.getString("ShipName");
         result.add(orderDetail);
