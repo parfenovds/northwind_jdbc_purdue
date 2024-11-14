@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   mssql:
-    image: mcr.microsoft.com/mssql/server:2019-latest
+    image: mcr.microsoft.com/mssql/server:2022-CU13-ubuntu-20.04
     container_name: mssql
     ports:
       - "1433:1433"
@@ -20,7 +20,7 @@ services:
       apt-get update && ACCEPT_EULA=Y apt-get install -y msodbcsql17 unixodbc-dev mssql-tools &&
       ln -s /opt/mssql-tools/bin/sqlcmd /usr/bin/sqlcmd &&
       /opt/mssql/bin/sqlservr &
-      sleep 30 &&
+      sleep 60 &&
       /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P NotPostgres123! -d master -i /sql-scripts/init-db.sql &&
       /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P NotPostgres123! -d Northwind -i /sql-scripts/user-init.sql &&
       wait"
